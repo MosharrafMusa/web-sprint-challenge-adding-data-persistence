@@ -15,6 +15,59 @@ router.get("/", (req, res) => {
     });
 });
 
+// GET - project by id
+router.get("/:id", (req, res) => {
+  Project.findProjectById(req.params.id)
+    .then((project) => {
+      res.status(200).json(project);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+// POST - add a new project
+router.post("/", (req, res) => {
+  Project.addProject(req.body)
+    .then((project) => {
+      res.status(200).json(req.body);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+// STRETCH GOAL.............................
+
+// STRETCH- GET RESOURCES OF A SPECIFIC PROJECT
+router.get("/:id/resources", (req, res) => {
+  Project.findResourcesByProjectId(req.params.id)
+    .then((resources) => {
+      res.status(200).json(resources);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+// STRETCH- GET A LIST OF PROJECT TASKS
+router.get("/:id/tasks", (req, res) => {
+  const { id } = req.params;
+  Project.findTasksByProjectId(id)
+    .then((tasks) => {
+      if (tasks.length) {
+        res.json(tasks);
+      } else {
+        res
+          .status(404)
+          .json({ message: "Could not find steps for given scheme" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Failed to get tasks" });
+    });
+});
+
 // GET - project by id - include id, name, desc, tasks, resources
 router.get("/:id", (req, res) => {
   const wholeproject = {};
@@ -31,17 +84,6 @@ router.get("/:id", (req, res) => {
     .then((projectResources) => {
       wholeproject.resources = projectResources;
       res.status(200).json(wholeproject);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-// POST - add a new project
-router.post("/", (req, res) => {
-  Project.addProject(req.body)
-    .then((project) => {
-      res.status(200).json(req.body);
     })
     .catch((err) => {
       res.status(500).json(err);
